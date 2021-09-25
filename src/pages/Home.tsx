@@ -6,18 +6,44 @@ import {
   TextInput,
   Platform,
   FlatList,
+  Alert,
 } from 'react-native';
 
 import { Button } from '../components/Button';
 import { SkillCard } from '../components/SkillCard';
 
+interface SkillData {
+  id: string;
+  name: string;
+}
+
 export function Home() {
   const [newSkill, setNewSkill] = useState('');
-  const [mySkills, setMySkills] = useState([]);
+  const [mySkills, setMySkills] = useState<SkillData[]>([]);
   const [greeting, setGretting] = useState('');
 
   function handleAddNewSkill() {
-    setMySkills(oldSate => [...oldSate, newSkill]);
+    if (newSkill === '') {
+     Alert.alert(
+       'Atenção',
+       'Não foi possivel uma habilidade vazia.'
+     )
+      return;
+    }
+
+    const data = {
+      id: String(new Date().getTime()),
+      name: newSkill,
+    }
+
+    setMySkills(oldSate => [...oldSate, data]);
+    setNewSkill('');
+  }
+
+  function handleRemoveSkill(id: string) {
+    setMySkills(oldState => oldState.filter(
+      skill => skill.id !== id
+    ));
   }
 
   useEffect(() => {
@@ -34,7 +60,7 @@ export function Home() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome, David Lucas</Text>
+      <Text style={styles.title}>Welcome, David 🤞</Text>
 
       <Text style={styles.greetings}>{greeting}</Text>
 
@@ -43,9 +69,13 @@ export function Home() {
         placeholder="New Skill"
         placeholderTextColor="#555"
         onChangeText={setNewSkill}
+        value={newSkill}
       />
 
-      <Button onPress={handleAddNewSkill} />  
+      <Button
+        title="Add Skill"
+        onPress={handleAddNewSkill}
+      /> 
 
       <Text style={[styles.title, { marginVertical: 50 }]}>
         My Skills
@@ -53,9 +83,12 @@ export function Home() {
 
       <FlatList
         data={mySkills}
-        keyExtractor={item => item}
+        keyExtractor={item => item.id}
         renderItem={({ item }) => (
-          <SkillCard skill={item} />
+          <SkillCard
+            skill={item.name}
+            onPress={() => handleRemoveSkill(item.id)}
+          />
         )}
       />
 
