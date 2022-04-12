@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Text, 
-  StyleSheet, 
-  View, 
+import {
+  Text,
+  StyleSheet,
+  View,
   TextInput,
   Platform,
   FlatList,
   Alert,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from 'react-native';
 
 import { Button } from '../components/Button';
@@ -24,10 +26,10 @@ export function Home() {
 
   function handleAddNewSkill() {
     if (newSkill === '') {
-     Alert.alert(
-       'Atenção',
-       'Não foi possivel uma habilidade vazia.'
-     )
+      Alert.alert(
+        'Atenção',
+        'Não foi possivel uma habilidade vazia.'
+      )
       return;
     }
 
@@ -38,12 +40,15 @@ export function Home() {
 
     setMySkills(oldSate => [...oldSate, data]);
     setNewSkill('');
+
+    Keyboard.dismiss();
   }
 
   function handleRemoveSkill(id: string) {
     setMySkills(oldState => oldState.filter(
       skill => skill.id !== id
     ));
+
   }
 
   useEffect(() => {
@@ -59,40 +64,42 @@ export function Home() {
   }, [mySkills])
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome, David 🤞</Text>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Welcome, David 🤞</Text>
 
-      <Text style={styles.greetings}>{greeting}</Text>
+        <Text style={styles.greetings}>{greeting}</Text>
 
-      <TextInput 
-        style={styles.input}
-        placeholder="New Skill"
-        placeholderTextColor="#555"
-        onChangeText={setNewSkill}
-        value={newSkill}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="New Skill"
+          placeholderTextColor="#555"
+          onChangeText={setNewSkill}
+          value={newSkill}
+        />
 
-      <Button
-        title="Add Skill"
-        onPress={handleAddNewSkill}
-      /> 
+        <Button
+          title="Add Skill"
+          onPress={handleAddNewSkill}
+        />
 
-      <Text style={[styles.title, { marginVertical: 50 }]}>
-        My Skills
-      </Text>
+        <Text style={[styles.title, { marginVertical: 50 }]}>
+          My Skills
+        </Text>
 
-      <FlatList
-        data={mySkills}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <SkillCard
-            skill={item.name}
-            onPress={() => handleRemoveSkill(item.id)}
-          />
-        )}
-      />
+        <FlatList
+          data={mySkills}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <SkillCard
+              skill={item.name}
+              onPress={() => handleRemoveSkill(item.id)}
+            />
+          )}
+        />
 
-    </View>
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
 
